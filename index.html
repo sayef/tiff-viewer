@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+    <title>tiff.js demo</title>
+    <link rel="stylesheet" href="./style/bootstrap.min.css">
+    <link rel="stylesheet" href="./style/bootstrap-theme.min.css">
+    <script src="./js/jquery-2.0.3.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/tiff.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function show(file) {
+                var reader = new FileReader();
+                reader.onload = (function (theFile) {
+                    return function (e) {
+                        var buffer = e.target.result;
+                        var tiff = new Tiff({buffer: buffer});
+                        var canvas = tiff.toCanvas();
+                        var width = tiff.width();
+                        var height = tiff.height();
+                        if (canvas) {
+                            var dataUrl = canvas.toDataURL();
+                            var img = document.createElement('img');
+                            img.id = 'docImgId';
+                            img.src = dataUrl;
+                            img.style.width = width;
+                            img.style.height = height;
+                            $('#output').empty().append(img);
+                            $('#download').css('visibility', 'visible');
+                            $('#download').attr('href', $('#docImgId').attr('src'));
+                        }
+                    };
+                })(file);
+                reader.readAsArrayBuffer(file);
+            }
+
+            $('#file').on('change', function (event) {
+                show(event.target.files[0]);
+            });
+
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1>Refined Document Image Viewer</h1>
+    </div>
+    <div class="well">
+        <input type="file" id="file" name="files"/>
+    </div>
+    <div class="well">
+        <a id="download" class="button" style="visibility: hidden; display: inline-block" download="document.png">Download</a>
+        <div id="output"></div>
+    </div>
+</div>
+</body>
+</html>
